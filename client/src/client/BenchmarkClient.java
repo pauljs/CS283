@@ -13,6 +13,22 @@ public class BenchmarkClient {
 		int port = Integer.parseInt(args[0]);
 		new WorkerThreadClient(port).start();
 		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
 		System.out.println("DONE");
 	}
 }

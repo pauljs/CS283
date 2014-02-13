@@ -38,7 +38,7 @@ public class WorkerThreadClient extends Thread {
 				e1.printStackTrace();
 			}
 			//System.out.println("Client Receiving");
-			w.println("hello world");
+			w.println("hello world, how are you doing today? World: I am doing well, thank you for asking!");
 			BufferedReader r;
 			try {
 				r = new BufferedReader(new InputStreamReader(s.getInputStream()));
