@@ -10,12 +10,9 @@ import java.net.UnknownHostException;
 public class BenchmarkClient {
 	
 	public static void main(String[] args) throws UnknownHostException, IOException{
-		long start = System.nanoTime();
 		int port = Integer.parseInt(args[0]);
-		while(System.nanoTime() - start <= Math.pow(10, 9)) { //go to run config. put in 4444, make two threads in stuff inwhile loop
-			new WorkerThreadClient(port).start();
-			new WorkerThreadClient(port).start();
-		}
+		new WorkerThreadClient(port).start();
+		new WorkerThreadClient(port).start();
 		System.out.println("DONE");
 	}
 }
