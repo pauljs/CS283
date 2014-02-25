@@ -67,7 +67,7 @@ public class WorkerThread extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		synchronized (bank.getAccount(accountFromNumber)){
+		synchronized (bank.getAccount(accountFromNumber)){// synchronizing both
 			synchronized (bank.getAccount(dstAccountNumber)) {
 				Account accountFrom = bank.getAccount(accountFromNumber);
 				Account dstAccount = bank.getAccount(dstAccountNumber);
