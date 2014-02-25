@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
 
 
 public class WorkerThread extends Thread {
@@ -52,14 +53,6 @@ public class WorkerThread extends Thread {
 	}
 
 	private String bankSystem(String line) {
-		if(line.equals("SHUTDOWN\n")) {
-			return line; //DO SOMETHING
-		}
-		int indexSpace1 = findSpace(0, line);
-		int indexSpace2 = findSpace(indexSpace1 + 1, line);
-		int transferAmount = Integer.parseInt(line.substring(0, indexSpace1));
-		int accountFromNumber = Integer.parseInt(line.substring(indexSpace1 + 1, indexSpace2));
-		int dstAccountNumber = Integer.parseInt(line.substring(indexSpace2 + 1, findNewLine(indexSpace2 + 1, line)));
 		BananaBank bank = null;
 		try {
 			bank = new BananaBank("accounts.txt");
@@ -67,14 +60,29 @@ public class WorkerThread extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		if(line.equals("SHUTDOWN\n")) {
+			Collection<Account> accounts = bank.getAllAccounts();
+			int totalAmount = 0;
+			for(Account account : accounts) {
+				totalAmount += account.getBalance();
+			}
+			line = "" + totalAmount;
+			return line; //DO SOMETHING
+		}
+		int indexSpace1 = findSpace(0, line);
+		int indexSpace2 = findSpace(indexSpace1 + 1, line);
+		int transferAmount = Integer.parseInt(line.substring(0, indexSpace1));
+		int accountFromNumber = Integer.parseInt(line.substring(indexSpace1 + 1, indexSpace2));
+		int dstAccountNumber = Integer.parseInt(line.substring(indexSpace2 + 1, findNewLine(indexSpace2 + 1, line)));
+		
 		synchronized (bank.getAccount(accountFromNumber)){// synchronizing both
 			synchronized (bank.getAccount(dstAccountNumber)) {
 				Account accountFrom = bank.getAccount(accountFromNumber);
 				Account dstAccount = bank.getAccount(dstAccountNumber);
 				if(accountFrom == null) {
-					line = "Account from number does not exist";
+					line = "Invalid source account";
 				} else if (dstAccount == null) {
-					line = "Account to number does not exist";
+					line = "Invalid destination account";
 				} else { //Accounts exist
 					accountFrom.transferTo(transferAmount, dstAccount); //MAKE SYNCHRONIZED
 					line = transferAmount + " transferred from account " + accountFromNumber + " to account " + dstAccountNumber + "\n";
