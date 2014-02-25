@@ -67,16 +67,21 @@ public class WorkerThread extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Account accountFrom = bank.getAccount(accountFromNumber);
-		Account dstAccount = bank.getAccount(dstAccountNumber);
-		if(accountFrom == null) {
-			line = "Account from number does not exist";
-		} else if (dstAccount == null) {
-			line = "Account to number does not exist";
-		} else { //Accounts exist
-			accountFrom.transferTo(transferAmount, dstAccount); //MAKE SYNCHRONIZED
-			line = transferAmount + " transferred from account " + accountFromNumber + " to account " + dstAccountNumber + "\n";
+		synchronized (bank.getAccount(accountFromNumber)){
+			synchronized (bank.getAccount(dstAccountNumber)) {
+				Account accountFrom = bank.getAccount(accountFromNumber);
+				Account dstAccount = bank.getAccount(dstAccountNumber);
+				if(accountFrom == null) {
+					line = "Account from number does not exist";
+				} else if (dstAccount == null) {
+					line = "Account to number does not exist";
+				} else { //Accounts exist
+					accountFrom.transferTo(transferAmount, dstAccount); //MAKE SYNCHRONIZED
+					line = transferAmount + " transferred from account " + accountFromNumber + " to account " + dstAccountNumber + "\n";
+				}
+			}
 		}
+		
 
 		return line;	
 	}
