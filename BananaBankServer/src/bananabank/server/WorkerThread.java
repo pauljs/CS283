@@ -60,7 +60,7 @@ public class WorkerThread extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(line.equals("SHUTDOWN\n")) {
+		if(line.equals("SHUTDOWN\n")) {//shutdown
 			Collection<Account> accounts = bank.getAllAccounts();
 			int totalAmount = 0;
 			for(Account account : accounts) {
