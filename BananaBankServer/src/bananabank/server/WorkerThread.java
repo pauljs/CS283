@@ -30,16 +30,21 @@ public class WorkerThread extends Thread {
 				String line;
 				while((line = r.readLine()) != null) {
 					System.out.println("Received: " + line);
+					boolean isShutdown = line.equals("SHUTDOWN\n");
 					String str = bankSystem(line);
-					w.println(line);
+					w.println(str);
+					if(isShutdown) {
+						w.close();
+					}
 					//w.flush();
 				}				
-				w.close(); //implicitly closes everything when closes PrintWriter
+				//w.close(); //implicitly closes everything when closes PrintWriter
 				System.out.println("Close disconnected");
 		} catch (IOException e) {
 			System.out.println("Error occurred, terminating");
 			e.printStackTrace();
-		} finally {
+		} 
+		/*finally {
 			if(!cs.isClosed()) {
 				try {
 					cs.close();
@@ -49,7 +54,7 @@ public class WorkerThread extends Thread {
 				}
 			}
 		}
-		System.out.println("Worker thread exiting");
+		System.out.println("Worker thread exiting");*/
 	}
 
 	private String bankSystem(String line) {
