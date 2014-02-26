@@ -25,24 +25,23 @@ public class WorkerThread extends Thread {
 		System.out.println("Worker thread starting");
 		try {
 			
-			System.out.println("ServerSocket created");
+			//System.out.println("ServerSocket created");
 			BufferedReader r = new BufferedReader(new InputStreamReader(cs.getInputStream()));
 			PrintStream w = new PrintStream(cs.getOutputStream());
-				System.out.println("Client connected");
-						
-				String line;
-				while((line = r.readLine()) != null) {
-					System.out.println("Received: " + line);
-					boolean isShutdown = line.equals("SHUTDOWN\n");
-					String str = bankSystem(line);
-					w.println(str);
-					if(isShutdown) {
-						w.close();
-					}
-					//w.flush();
-				}				
-				//w.close(); //implicitly closes everything when closes PrintWriter
-				System.out.println("Close disconnected");
+			//System.out.println("Client connected");
+					
+			String line;
+			while((line = r.readLine()) != null) {
+				System.out.println("Received: " + line);
+				if(line.equals("SHUTDOWN\n")) {
+					cs.close();
+				}
+				String str = bankSystem(line);
+				w.println(str);
+				//w.flush();
+			}				
+			//w.close(); //implicitly closes everything when closes PrintWriter
+			//System.out.println("Close disconnected");
 		} catch (IOException e) {
 			System.out.println("Error occurred, terminating");
 			e.printStackTrace();
@@ -102,11 +101,10 @@ public class WorkerThread extends Thread {
 			}
 		}
 		
-
 		return line;	
 	}
 
-	private int findNewLine(int i, String line) {
+	/*private int findNewLine(int i, String line) {
 		for(; i < line.length(); ++i) {
 			if(line.substring(i).equals("\n")) {
 				return i;
@@ -122,5 +120,5 @@ public class WorkerThread extends Thread {
 			}
 		}
 		return -1; //means no space
-	}
+	}*/
 }
