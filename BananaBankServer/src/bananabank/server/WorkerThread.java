@@ -12,9 +12,11 @@ import java.util.Collection;
 public class WorkerThread extends Thread {
 	
 	Socket cs;
+	BananaBank bank;
 	
-	public WorkerThread(Socket cs) {
+	public WorkerThread(Socket cs, BananaBank bank) {
 		this.cs = cs;
+		this.bank = bank;
 	}
 	
 	@Override
@@ -58,13 +60,6 @@ public class WorkerThread extends Thread {
 	}
 
 	private String bankSystem(String line) {
-		BananaBank bank = null;
-		try {
-			bank = new BananaBank("accounts.txt");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		if(line.equals("SHUTDOWN\n")) {//shutdown
 			Collection<Account> accounts = bank.getAllAccounts();
 			int totalAmount = 0;
