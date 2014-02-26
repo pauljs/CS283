@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
+import java.util.StringTokenizer;
 
 
 public class WorkerThread extends Thread {
@@ -69,15 +70,26 @@ public class WorkerThread extends Thread {
 			line = "" + totalAmount;
 			return line; //DO SOMETHING
 		}
-		int indexSpace1 = findSpace(0, line);
-		int indexSpace2 = findSpace(indexSpace1 + 1, line);
-		int transferAmount = Integer.parseInt(line.substring(0, indexSpace1));
-		int accountFromNumber = Integer.parseInt(line.substring(indexSpace1 + 1, indexSpace2));
-		int dstAccountNumber = Integer.parseInt(line.substring(indexSpace2 + 1, findNewLine(indexSpace2 + 1, line)));
-		
-		synchronized (bank.getAccount(accountFromNumber)){// synchronizing both
-			synchronized (bank.getAccount(dstAccountNumber)) {
-				Account accountFrom = bank.getAccount(accountFromNumber);
+		StringTokenizer st = new StringTokenizer(line);
+		int transferAmount = Integer.parseInt(st.nextToken());
+		int srcAccountNumber = Integer.parseInt(st.nextToken());
+		int dstAccountNumber = Integer.parseInt(st.nextToken());
+		//int indexSpace1 = findSpace(0, line);
+		//int indexSpace2 = findSpace(indexSpace1 + 1, line);
+		//int transferAmount = Integer.parseInt(line.substring(0, indexSpace1));
+		//int accountFromNumber = Integer.parseInt(line.substring(indexSpace1 + 1, indexSpace2));
+		//int dstAccountNumber = Integer.parseInt(line.substring(indexSpace2 + 1, findNewLine(indexSpace2 + 1, line)));
+		int smallerAccountNumber, largerAccountNumber;
+		if(srcAccountNumber < dstAccountNumber) {
+			smallerAccountNumber = srcAccountNumber;
+			largerAccountNumber = dstAccountNumber;
+		} else {
+			smallerAccountNumber = dstAccountNumber;
+			largerAccountNumber = srcAccountNumber;
+		}
+		synchronized (bank.getAccount(smallerAccountNumber)){// synchronizing both
+			synchronized (bank.getAccount(largerAccountNumber)) {
+				Account accountFrom = bank.getAccount(srcAccountNumber);
 				Account dstAccount = bank.getAccount(dstAccountNumber);
 				if(accountFrom == null) {
 					line = "Invalid source account";
@@ -85,7 +97,7 @@ public class WorkerThread extends Thread {
 					line = "Invalid destination account";
 				} else { //Accounts exist
 					accountFrom.transferTo(transferAmount, dstAccount); //MAKE SYNCHRONIZED
-					line = transferAmount + " transferred from account " + accountFromNumber + " to account " + dstAccountNumber + "\n";
+					line = transferAmount + " transferred from account " + srcAccountNumber + " to account " + dstAccountNumber + "\n";
 				}
 			}
 		}
