@@ -14,9 +14,11 @@ public class WorkerThread extends Thread {
 	
 	Socket cs;
 	BananaBank bank;
+	ServerSocket ss;
 	
-	public WorkerThread(Socket cs, BananaBank bank) {
+	public WorkerThread(Socket cs, ServerSocket ss, BananaBank bank) {
 		this.cs = cs;
+		this.ss = ss;
 		this.bank = bank;
 	}
 	
@@ -33,14 +35,18 @@ public class WorkerThread extends Thread {
 			String line;
 			while((line = r.readLine()) != null) {
 				System.out.println("Received: " + line);
-				if(line.equals("SHUTDOWN\n")) {
-					cs.close();
+				if(line.startsWith("SHUTDOWN")) {
+					ss.close();
+					MTServer.shutdownStream = w;
 				}
+
 				String str = bankSystem(line);
+				System.out.println(str);
 				w.println(str);
+				
 				//w.flush();
 			}				
-			//w.close(); //implicitly closes everything when closes PrintWriter
+			w.close(); //implicitly closes everything when closes PrintWriter
 			//System.out.println("Close disconnected");
 		} catch (IOException e) {
 			System.out.println("Error occurred, terminating");
@@ -60,7 +66,7 @@ public class WorkerThread extends Thread {
 	}
 
 	private String bankSystem(String line) {
-		if(line.equals("SHUTDOWN\n")) {//shutdown
+		/*if(line.equals("SHUTDOWN\n")) {//shutdown
 			Collection<Account> accounts = bank.getAllAccounts();
 			int totalAmount = 0;
 			for(Account account : accounts) {
@@ -68,7 +74,7 @@ public class WorkerThread extends Thread {
 			}
 			line = "" + totalAmount;
 			return line; //DO SOMETHING
-		}
+		}*/
 		StringTokenizer st = new StringTokenizer(line);
 		int transferAmount = Integer.parseInt(st.nextToken());
 		int srcAccountNumber = Integer.parseInt(st.nextToken());
