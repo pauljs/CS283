@@ -38,6 +38,7 @@ public class WorkerThread extends Thread {
 				if(line.startsWith("SHUTDOWN")) {
 					ss.close();
 					MTServer.shutdownStream = w;
+					return;
 				}
 
 				String str = bankSystem(line);
@@ -102,7 +103,7 @@ public class WorkerThread extends Thread {
 					line = "Invalid destination account";
 				} else { //Accounts exist
 					accountFrom.transferTo(transferAmount, dstAccount); //MAKE SYNCHRONIZED
-					line = transferAmount + " transferred from account " + srcAccountNumber + " to account " + dstAccountNumber + "\n";
+					line = transferAmount + " transferred from account " + srcAccountNumber + " to account " + dstAccountNumber;
 				}
 			}
 		}
