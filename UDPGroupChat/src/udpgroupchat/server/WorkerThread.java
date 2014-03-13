@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import udpgroupchat.client.Client;
 
 public class WorkerThread extends Thread {
 
@@ -53,10 +59,12 @@ public class WorkerThread extends Thread {
 			return;
 		}
 		
-		if (payload.startsWith("SHUTDOWN")) {
-			onShutdownRequested(payload);
+		if (payload.startsWith("ACK")) {
+			onAckRequested(payload);
 			return;
 		}
+		
+		
 
 		//
 		// implement other request handlers here...
@@ -83,7 +91,7 @@ public class WorkerThread extends Thread {
 
 		// create a client object, and put it in the map that assigns names
 		// to client objects
-		Server.clientEndPoints.add(new ClientEndPoint(address, port));
+		Server.clientEndPoints.add(new ClientEndPoint(address, port, null));
 		// note that calling clientEndPoints.add() with the same endpoint info
 		// (address and port)
 		// multiple times will not add multiple instances of ClientEndPoint to
@@ -102,7 +110,7 @@ public class WorkerThread extends Thread {
 
 	private void onUnregisterRequested(String payload) {
 		ClientEndPoint clientEndPoint = new ClientEndPoint(
-				this.rxPacket.getAddress(), this.rxPacket.getPort());
+				this.rxPacket.getAddress(), this.rxPacket.getPort(), null);
 
 		// check if client is in the set of registered clientEndPoints
 		if (Server.clientEndPoints.contains(clientEndPoint)) {
@@ -127,6 +135,9 @@ public class WorkerThread extends Thread {
 
 	private void onSendRequested(String payload) {
 		// the message is comes after "SEND" in the payload
+		
+		//send id and update ip address every time
+		
 		String message = payload.substring("SEND".length() + 1,
 				payload.length()).trim();
 		for (ClientEndPoint clientEndPoint : Server.clientEndPoints) {
@@ -141,10 +152,45 @@ public class WorkerThread extends Thread {
 	
 	private void onJoinRequested(String payload) {
 		// the message is comes after "JOIN" in the payload
+		//In format: "uniqueID groupName"
+		
 		//QUESITONS:
 		//1. Should we have a Hashmap of group name to list of people in group?
 		//2. Thus should we edit Register to register to a certain group and
 		//   send to send to people in the certain group?
+		// get the address of the sender from the rxPacket
+		
+		InetAddress address = this.rxPacket.getAddress();
+		// get the port of the sender from the rxPacket
+		int port = this.rxPacket.getPort();
+
+		// create a client object, and put it in the map that assigns names
+		// to client objects
+		StringTokenizer st = new StringTokenizer(payload);
+		st.nextToken();
+		int uniqueID = Integer.parseInt(st.nextToken());
+		String groupName = st.nextToken();
+		if(Server.groupsToClientsMap.get(groupName) == null) {
+			Server.groupsToClientsMap.put(groupName, new ArrayList<ClientEndPoint>());
+		}
+		
+		Server.groupsToClientsMap.get(groupName).add(new ClientEndPoint(address, port, null));
+			
+		//Server.clientEndPoints.add(new ClientEndPoint(address, port));
+		// note that calling clientEndPoints.add() with the same endpoint info
+		// (address and port)
+		// multiple times will not add multiple instances of ClientEndPoint to
+		// the set, because ClientEndPoint.hashCode() is overridden. See
+		// http://docs.oracle.com/javase/7/docs/api/java/util/Set.html for
+		// details.
+
+		// tell client we're OK
+		try {
+			send("JOINED\n", this.rxPacket.getAddress(),
+					this.rxPacket.getPort());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void onPollRequested(String payload) {
@@ -153,6 +199,79 @@ public class WorkerThread extends Thread {
 		//1. I assume we will need a HashMap for messages waiting to be sent
 		//   How do we keep track of which messages need to be sent to which people?
 		
+		InetAddress address = this.rxPacket.getAddress();
+		// get the port of the sender from the rxPacket
+		int port = this.rxPacket.getPort();
+
+		// create a client object, and put it in the map that assigns names
+		// to client objects
+		StringTokenizer st = new StringTokenizer(payload);
+		int uniqueId = Integer.parseInt(st.nextToken());
+		final ClientEndPoint client = Server.idToClientMap.get(uniqueId);
+		final ArrayList<String> messages = Server.clientToMessages.get(client);
+		
+		sendMessages(client, messages);
+		
+		for(String str : messages) {
+			String message = payload.substring("SEND".length() + 1,
+					str.length()).trim();
+			
+			try {
+				send("MESSAGE: " + message + "\n", client.address,
+						client.port);
+				
+				TimerTask timerTask = new TimerTask() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						sendMessages2(client, messages);
+					}
+				};
+				
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	private void sendMessages2(ClientEndPoint client,
+			ArrayList<String> messages) {
+		// TODO Auto-generated method stub
+		sendMessages(client, messages);
+		Timer timer = new Timer();
+		timer.schedule(client.timerTask, 3000);
+	}
+	
+	private void sendMessages(ClientEndPoint client, ArrayList<String> messages) {
+		// TODO Auto-generated method stub
+		if(messages.size() != 0) {
+			String payload = messages.get(0);
+			String message = payload.trim();
+			
+			try {
+				send("MESSAGE: " + message + "\n", client.address,
+						client.port);
+				
+//				TimerTask timerTask = new TimerTask() {
+//
+//					@Override
+//					public void run() {
+//						// TODO Auto-generated method stub
+//						
+//					}
+//					
+//				};
+				
+				Timer timer = new Timer();
+				timer.schedule(client.timerTask, 3000);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
 	}
 	
 	private void onIPChangeRequested(String payload) {
@@ -165,12 +284,29 @@ public class WorkerThread extends Thread {
 		
 	}
 	
-	private void onShutdownRequested(String payload) {
+	private void onAckRequested(String payload) {
 		// the message is comes after "Shutdown" in the payload
+		// ACK uniqueID StringSent
+		//must manually send this ack
+		
 		//QUESTIONS REGARDING POLL:
 		//1. If shutdown is sent, should we unregister everyone?
 		//2. If Shutdown is sent, should it be similar as to the shutdown in the previous project?
 		
+		InetAddress address = this.rxPacket.getAddress();
+		// get the port of the sender from the rxPacket
+		int port = this.rxPacket.getPort();
+
+		// create a client object, and put it in the map that assigns names
+		// to client objects
+		StringTokenizer st = new StringTokenizer(payload);
+		int uniqueId = Integer.parseInt(st.nextToken());
+		String message = st.nextToken();
+		ClientEndPoint client = Server.idToClientMap.get(uniqueId);
+		client.timerTask.cancel();
+		Server.clientToMessages.get(client).remove(message);
+		ArrayList<String> messages = Server.clientToMessages.get(client);
+		sendMessages(client, messages);
 	}
 
 

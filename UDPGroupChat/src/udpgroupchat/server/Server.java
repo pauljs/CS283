@@ -3,8 +3,11 @@ package udpgroupchat.server;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Server {
@@ -21,6 +24,9 @@ public class Server {
 	// concurrent threads without additional locking
 	protected static final Set<ClientEndPoint> clientEndPoints = Collections
 			.synchronizedSet(new HashSet<ClientEndPoint>());
+	protected static final Map<String, ArrayList<ClientEndPoint>> groupsToClientsMap = Collections.synchronizedMap( new HashMap<String, ArrayList<ClientEndPoint>>());
+	protected static final Map<Integer, ClientEndPoint> idToClientMap = Collections.synchronizedMap(new HashMap<Integer, ClientEndPoint>());
+	protected static final Map<ClientEndPoint, ArrayList<String>> clientToMessages = Collections.synchronizedMap( new HashMap<ClientEndPoint, ArrayList<String>>());
 
 	// constructor
 	Server(int port) {
