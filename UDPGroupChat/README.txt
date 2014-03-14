@@ -11,3 +11,5 @@ POLL uniqueId
 SEND uniqueId message
 
 ACK uniqueId messageReceived
+
+SHUTDOWN

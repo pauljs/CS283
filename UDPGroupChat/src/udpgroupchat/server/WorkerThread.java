@@ -9,6 +9,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 import udpgroupchat.client.Client;
 
 //FOR NETCAT- do "nc -u localhost 20000" because port is 20000
@@ -63,6 +64,12 @@ public class WorkerThread extends Thread {
 		
 		if (payload.startsWith("ACK")) {
 			onAckRequested(payload);
+			return;
+		}
+		
+		if(payload.startsWith("SHUTDOWN")) {
+			socket.close();
+			//MTServer.shutdownStream = w;
 			return;
 		}
 		
