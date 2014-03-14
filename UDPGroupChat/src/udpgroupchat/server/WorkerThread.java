@@ -29,10 +29,11 @@ public class WorkerThread extends Thread {
 
 		// dispatch request handler functions based on the payload's prefix
 
-		if (payload.startsWith("REGISTER")) {
-			onRegisterRequested(payload);
-			return;
-		}
+//		
+//		if (payload.startsWith("REGISTER")) {
+//			onRegisterRequested(payload);
+//			return;
+//		}
 
 		if (payload.startsWith("UNREGISTER")) {
 			onUnregisterRequested(payload);
@@ -83,6 +84,7 @@ public class WorkerThread extends Thread {
 		this.socket.send(txPacket);
 	}
 
+	/*
 	private void onRegisterRequested(String payload) {
 		// get the address of the sender from the rxPacket
 		InetAddress address = this.rxPacket.getAddress();
@@ -107,6 +109,7 @@ public class WorkerThread extends Thread {
 			e.printStackTrace();
 		}
 	}
+	*/
 
 	private void onUnregisterRequested(String payload) {
 		// unregister id group
