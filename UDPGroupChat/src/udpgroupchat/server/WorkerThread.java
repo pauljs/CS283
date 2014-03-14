@@ -11,10 +11,11 @@ import java.util.TimerTask;
 
 import udpgroupchat.client.Client;
 
+//FOR NETCAT- do "nc -u localhost 20000" because port is 20000
 public class WorkerThread extends Thread {
 
 	private DatagramPacket rxPacket;
-	private DatagramSocket socket;
+	public static DatagramSocket socket;
 
 	public WorkerThread(DatagramPacket packet, DatagramSocket socket) {
 		this.rxPacket = packet;
@@ -113,14 +114,41 @@ public class WorkerThread extends Thread {
 
 	private void onUnregisterRequested(String payload) {
 		// unregister id group
-		
+		/*
 		ClientEndPoint clientEndPoint = new ClientEndPoint(
 				this.rxPacket.getAddress(), this.rxPacket.getPort(), null);
-
+		*/
+		
+		StringTokenizer st = new StringTokenizer(payload);
+		st.nextToken();
+		int uniqueId = Integer.parseInt(st.nextToken());
+		String groupName = st.nextToken();
+		
+		if(Server.groupsToClientsMap.get(groupName) == null) {
+			try {
+				send("GROUP DOES NOT EXIST\n", this.rxPacket.getAddress(),
+						this.rxPacket.getPort());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+		
+		if(Server.idToClientMap.get(uniqueId) == null) {
+			try {
+				send("CLIENT DOES NOT EXIST\n", this.rxPacket.getAddress(),
+						this.rxPacket.getPort());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+		
 		// check if client is in the set of registered clientEndPoints
-		if (Server.clientEndPoints.contains(clientEndPoint)) {
+		ClientEndPoint client = Server.idToClientMap.get(uniqueId);
+		if (client != null && Server.groupsToClientsMap.get(groupName).contains(client)) {
 			// yes, remove it
-			Server.clientEndPoints.remove(clientEndPoint);
+			Server.groupsToClientsMap.get(groupName).remove(client);
 			try {
 				send("UNREGISTERED\n", this.rxPacket.getAddress(),
 						this.rxPacket.getPort());
@@ -204,7 +232,10 @@ public class WorkerThread extends Thread {
 			Server.idToClientMap.put(uniqueID, newClient);
 			Server.groupsToClientsMap.get(groupName).add(Server.idToClientMap.get(uniqueID));
 			Server.clientToMessages.put(Server.idToClientMap.get(uniqueID), new ArrayList<String>());
-		} else {			Server.groupsToClientsMap.get(groupName).remove(uniqueID);
+		} else {			int index = Server.groupsToClientsMap.get(groupName).indexOf(Server.idToClientMap.get(uniqueID));
+			if(index != -1) {
+				Server.groupsToClientsMap.get(groupName).remove(Server.groupsToClientsMap.get(groupName).indexOf(Server.idToClientMap.get(uniqueID)));
+			}
 			ArrayList<String> messages = Server.clientToMessages.get(Server.idToClientMap.get(uniqueID));
 			Server.idToClientMap.put(uniqueID, newClient);
 			Server.groupsToClientsMap.get(groupName).add(Server.idToClientMap.get(uniqueID));
@@ -282,7 +313,7 @@ public class WorkerThread extends Thread {
 		// TODO Auto-generated method stub
 		sendMessages(client, messages);
 		Timer timer = new Timer();
-		timer.schedule(client.timerTask, 3000);
+		timer.schedule(client.timerTask, 8000);
 	}
 	
 	private void sendMessages(ClientEndPoint client, ArrayList<String> messages) {
@@ -306,7 +337,8 @@ public class WorkerThread extends Thread {
 //				};
 				
 				Timer timer = new Timer();
-				timer.schedule(client.timerTask, 3000);
+				client.timerTask = new ClientTimerTask(client, Server.clientToMessages.get(client));
+				timer.schedule(client.timerTask, 8000);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -340,6 +372,7 @@ public class WorkerThread extends Thread {
 		// create a client object, and put it in the map that assigns names
 		// to client objects
 		StringTokenizer st = new StringTokenizer(payload);
+		st.nextToken();
 		int uniqueId = Integer.parseInt(st.nextToken());
 		String message = st.nextToken();
 		ClientEndPoint client = Server.idToClientMap.get(uniqueId);

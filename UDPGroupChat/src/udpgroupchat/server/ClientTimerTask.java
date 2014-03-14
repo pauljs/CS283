@@ -16,7 +16,7 @@ public class ClientTimerTask extends TimerTask {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		WorkerThread thread = new WorkerThread(null, null);
+		WorkerThread thread = new WorkerThread(null, WorkerThread.socket);
 		thread.sendMessages2(client, messages);
 	}
 
