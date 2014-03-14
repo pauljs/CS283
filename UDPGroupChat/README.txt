@@ -9,3 +9,5 @@ UNREGISTER uniqueId groupName
 POLL uniqueId
 
 SEND uniqueId message
+
+ACK uniqueId messageReceived
