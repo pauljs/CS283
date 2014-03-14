@@ -109,6 +109,8 @@ public class WorkerThread extends Thread {
 	}
 
 	private void onUnregisterRequested(String payload) {
+		// unregister id group
+		
 		ClientEndPoint clientEndPoint = new ClientEndPoint(
 				this.rxPacket.getAddress(), this.rxPacket.getPort(), null);
 
@@ -135,19 +137,39 @@ public class WorkerThread extends Thread {
 
 	private void onSendRequested(String payload) {
 		// the message is comes after "SEND" in the payload
+		// SEND uniqueID group message
 		
 		//send id and update ip address every time
+		InetAddress address = this.rxPacket.getAddress();
+		// get the port of the sender from the rxPacket
+		int port = this.rxPacket.getPort();
+
+		// create a client object, and put it in the map that assigns names
+		// to client objects
+		StringTokenizer st = new StringTokenizer(payload);
+		st.nextToken();
+		int uniqueID = Integer.parseInt(st.nextToken());
+		String groupName = st.nextToken();
 		
-		String message = payload.substring("SEND".length() + 1,
+		String message = payload.substring("SEND".length() + ("  " + uniqueID).length() + groupName.length() + 1,
 				payload.length()).trim();
-		for (ClientEndPoint clientEndPoint : Server.clientEndPoints) {
-			try {
-				send("MESSAGE: " + message + "\n", clientEndPoint.address,
-						clientEndPoint.port);
-			} catch (IOException e) {
-				e.printStackTrace();
+		ArrayList<ClientEndPoint> clients = Server.groupsToClientsMap.get(groupName);
+		ClientEndPoint curClient = Server.idToClientMap.get(uniqueID);
+		for (ClientEndPoint clientEndPoint : clients) {
+			if(clientEndPoint != curClient) {
+				Server.clientToMessages.get(clientEndPoint).add(message);
 			}
+			/*send("MESSAGE: " + message + "\n", clientEndPoint.address,
+					clientEndPoint.port);*/
 		}
+		try {
+			send("SENT: " + message + "\n", address,
+					port);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private void onJoinRequested(String payload) {
@@ -174,7 +196,18 @@ public class WorkerThread extends Thread {
 			Server.groupsToClientsMap.put(groupName, new ArrayList<ClientEndPoint>());
 		}
 		
-		Server.groupsToClientsMap.get(groupName).add(new ClientEndPoint(address, port, null));
+		ClientEndPoint newClient = new ClientEndPoint(address, port, null);
+		if(Server.idToClientMap.get(uniqueID) == null) {
+			Server.idToClientMap.put(uniqueID, newClient);
+			Server.groupsToClientsMap.get(groupName).add(Server.idToClientMap.get(uniqueID));
+			Server.clientToMessages.put(Server.idToClientMap.get(uniqueID), new ArrayList<String>());
+		} else {			Server.groupsToClientsMap.get(groupName).remove(uniqueID);
+			ArrayList<String> messages = Server.clientToMessages.get(Server.idToClientMap.get(uniqueID));
+			Server.idToClientMap.put(uniqueID, newClient);
+			Server.groupsToClientsMap.get(groupName).add(Server.idToClientMap.get(uniqueID));
+			Server.clientToMessages.put(Server.idToClientMap.get(uniqueID), messages);
+		}
+		
 			
 		//Server.clientEndPoints.add(new ClientEndPoint(address, port));
 		// note that calling clientEndPoints.add() with the same endpoint info
@@ -195,6 +228,8 @@ public class WorkerThread extends Thread {
 	
 	private void onPollRequested(String payload) {
 		// the message is comes after "POLL" in the payload
+		//POLL id group
+		
 		//QUESTIONS REGARDING POLL:
 		//1. I assume we will need a HashMap for messages waiting to be sent
 		//   How do we keep track of which messages need to be sent to which people?
@@ -206,12 +241,13 @@ public class WorkerThread extends Thread {
 		// create a client object, and put it in the map that assigns names
 		// to client objects
 		StringTokenizer st = new StringTokenizer(payload);
+		st.nextToken();
 		int uniqueId = Integer.parseInt(st.nextToken());
 		final ClientEndPoint client = Server.idToClientMap.get(uniqueId);
 		final ArrayList<String> messages = Server.clientToMessages.get(client);
 		
 		sendMessages(client, messages);
-		
+		/*
 		for(String str : messages) {
 			String message = payload.substring("SEND".length() + 1,
 					str.length()).trim();
@@ -235,9 +271,10 @@ public class WorkerThread extends Thread {
 			}
 			
 		}
+		*/
 	}
 	
-	private void sendMessages2(ClientEndPoint client,
+	public void sendMessages2(ClientEndPoint client,
 			ArrayList<String> messages) {
 		// TODO Auto-generated method stub
 		sendMessages(client, messages);

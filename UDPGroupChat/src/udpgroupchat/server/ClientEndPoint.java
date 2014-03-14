@@ -1,14 +1,13 @@
 package udpgroupchat.server;
 
 import java.net.InetAddress;
-import java.util.TimerTask;
 
 public class ClientEndPoint {
 	protected final InetAddress address;
 	protected final int port;
-	protected final TimerTask timerTask;
+	protected final ClientTimerTask timerTask;
 	
-	public ClientEndPoint(InetAddress addr, int port, TimerTask timerTask) {
+	public ClientEndPoint(InetAddress addr, int port, ClientTimerTask timerTask) {
 		this.address = addr;
 		this.port = port;
 		this.timerTask = timerTask;
