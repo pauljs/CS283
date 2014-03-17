@@ -188,6 +188,15 @@ public class WorkerThread extends Thread {
 		st.nextToken();
 		int uniqueID = Integer.parseInt(st.nextToken());
 		String groupName = st.nextToken();
+		if(!Server.groupsToClientsMap.get(groupName).contains(Server.idToClientMap.get(uniqueID))) {
+			try {
+				send("NOT JOINED IN GROUP\n", this.rxPacket.getAddress(),
+						this.rxPacket.getPort());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
 		
 		String message = payload.substring("SEND".length() + ("  " + uniqueID).length() + groupName.length() + 1,
 				payload.length()).trim();
