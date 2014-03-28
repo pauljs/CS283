@@ -1,5 +1,5 @@
 package bananabank.server;
-//
+
 public class Account {
 	private final int accountNumber;
 	private int balance;
