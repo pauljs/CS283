@@ -44,5 +44,6 @@ public class MTServer {
 			totalAmount += account.getBalance();
 		}
 		shutdownStream.println(totalAmount);
+		bank.save("answer.txt");  //save to file
 	}
 }
