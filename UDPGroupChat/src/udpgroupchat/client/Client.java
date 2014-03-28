@@ -16,7 +16,7 @@ public class Client {
 
 	// constructor
 	Client(String serverAddress, int serverPort) {
-		this.serverAddress = serverAddress;
+		this.serverAddress = serverAddress;//ec2
 		this.serverPort = serverPort;
 	}
 
