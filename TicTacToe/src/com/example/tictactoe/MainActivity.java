@@ -6,6 +6,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import android.app.Activity;
@@ -25,10 +26,10 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	protected static final int TICTACTOE_PORT = 20000;
-	protected static final String SERVER_ADDRESS = "ec2-54-186-162-168.uswest-2.compute-amazonaws.com";
+	protected static final String SERVER_ADDRESS = "54.186.162.168";//ec2-54-186-162-168.uswest-2.compute-amazonaws.com
 	public static final int MAX_PACKET_SIZE = 512;
+	public DatagramSocket socket;
 	
-	public static DatagramSocket socket;
 	public Button button11;
 	public Button button12;
 	public Button button13;
@@ -69,6 +70,12 @@ public class MainActivity extends Activity {
 		groupNameEditText = (EditText) findViewById(R.id.groupNameEditText);
 		idEditText = (EditText) findViewById(R.id.idEditText);
 		letterEditText = (EditText) findViewById(R.id.letterEditText);
+		try {
+			socket = new DatagramSocket();
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -190,7 +197,7 @@ public class MainActivity extends Activity {
 //			Socket socket = null;
 //			BufferedReader reader = null;
 			String payload = null;
-			DatagramSocket socket = null;
+
 			try {
 //				int TICTACTOE_PORT = 20000;
 //				String SERVER_ADDRESS = "ec2-54-186-162-168.uswest-2.compute-amazonaws.com";
@@ -204,7 +211,7 @@ public class MainActivity extends Activity {
 				// http://docs.oracle.com/javase/tutorial/networking/datagrams/ for
 				// details.
 				System.out.println("before socket");
-				socket = new DatagramSocket();
+				
 
 				// send "REGISTER" to the server
 				//
@@ -225,6 +232,7 @@ public class MainActivity extends Activity {
 				DatagramPacket rxPacket = new DatagramPacket(buf, buf.length);
 				// call receive (this will populate the packet with the received
 				// data, and the other endpoint's info)
+				System.out.println("about to receive");
 				socket.receive(rxPacket);
 				// print the payload
 				payload = new String(rxPacket.getData(), 0,
