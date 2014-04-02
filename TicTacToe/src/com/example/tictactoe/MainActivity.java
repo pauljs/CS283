@@ -145,7 +145,7 @@ public class MainActivity extends Activity {
 	}
 	
 	private void startTicTacToeAsyncTask(String dash, String string) {
-		if(dash.equals("-")) {
+		if(!dash.equals("-")) {
 			Toast.makeText(getApplicationContext(), "Already Taken!", Toast.LENGTH_SHORT).show();
 		} else {
 			enableAllButtons(false);
