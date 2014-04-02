@@ -96,7 +96,7 @@
         android:id="@+id/groupNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/sendButton"
+        android:layout_above="@+id/sendButton1"
         android:layout_alignParentLeft="true"
         android:ems="10"
         android:hint="Type Group Name Here" />
@@ -122,16 +122,6 @@
         android:hint="Type Unique Id Here"
         android:inputType="number" />
 
-    <Button
-        android:id="@+id/sendButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button11"
-        android:layout_alignLeft="@+id/groupNameEditText"
-        android:layout_marginBottom="14dp"
-        android:text="Send"
-        android:onClick = "sendButtonOnClick" />
-
     <EditText
         android:id="@+id/letterEditText"
         android:layout_width="wrap_content"
@@ -145,12 +135,13 @@
     </EditText>
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/sendButton1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/sendButton"
-        android:layout_below="@+id/button31"
-        android:enabled="false"
-        android:text="Poll" />
+        android:layout_above="@+id/button13"
+        android:layout_marginBottom="16dp"
+        android:layout_toRightOf="@+id/groupNameEditText"
+        android:onClick="sendButtonOnClick"
+        android:text="Send" />
 
 </RelativeLayout>

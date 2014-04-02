@@ -99,29 +99,11 @@
         android:onClick="button11OnClick"
         android:text="-" />
 
-    <Button
-        android:id="@+id/sendButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button11"
-        android:layout_marginBottom="14dp"
-        android:onClick="sendButtonOnClick"
-        android:text="Send" />
-
-    <Button
-        android:id="@+id/pollButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/sendButton"
-        android:layout_below="@+id/button31"
-        android:enabled="false"
-        android:text="Poll" />
-
     <EditText
         android:id="@+id/letterEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/sendButton"
+        android:layout_above="@+id/sendButton1"
         android:layout_alignParentLeft="true"
         android:ems="10"
         android:hint="Letter" >
@@ -147,5 +129,23 @@
         android:layout_alignParentLeft="true"
         android:ems="10"
         android:hint="Group Name" />
+
+    <Button
+        android:id="@+id/buttonPoll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/button33"
+        android:onClick="pollButton1OnClick"
+        android:text="Poll" />
+
+    <Button
+        android:id="@+id/sendButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button13"
+        android:layout_alignParentRight="true"
+        android:onClick="sendButtonOnClick"
+        android:text="Send" />
 
 </RelativeLayout>

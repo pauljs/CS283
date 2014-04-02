@@ -26,7 +26,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	protected static final int TICTACTOE_PORT = 20000;
-	protected static final String SERVER_ADDRESS = "54.186.162.168";//ec2-54-186-162-168.uswest-2.compute-amazonaws.com
+	protected static final String SERVER_ADDRESS = "10.67.11.253";//54.186.162.168//ec2-54-186-162-168.uswest-2.compute-amazonaws.com
 	public static final int MAX_PACKET_SIZE = 512;
 	public DatagramSocket socket;
 	
@@ -39,11 +39,12 @@ public class MainActivity extends Activity {
 	public Button button31;
 	public Button button32;
 	public Button button33;
-	public Button pollButton;
+	public Button pollButton1;
 	public Button sendButton;
 	public EditText groupNameEditText;
 	public EditText idEditText;
 	public EditText letterEditText;
+	public boolean firstPull;
 
 	
 	@Override
@@ -65,11 +66,12 @@ public class MainActivity extends Activity {
 		button31 = (Button) findViewById(R.id.button31);
 		button32 = (Button) findViewById(R.id.button32);
 		button33 = (Button) findViewById(R.id.button33);
-		sendButton = (Button) findViewById(R.id.sendButton);
-		pollButton = (Button) findViewById(R.id.pollButton);
+		sendButton = (Button) findViewById(R.id.sendButton1);
+		pollButton1 = (Button) findViewById(R.id.buttonPoll);
 		groupNameEditText = (EditText) findViewById(R.id.groupNameEditText);
 		idEditText = (EditText) findViewById(R.id.idEditText);
 		letterEditText = (EditText) findViewById(R.id.letterEditText);
+		firstPull = false;
 		try {
 			socket = new DatagramSocket();
 		} catch (SocketException e) {
@@ -129,59 +131,80 @@ public class MainActivity extends Activity {
 				sendButton.setEnabled(false);
 				System.out.println("WHY");
 				TicTacToeAsyncTask taskRegister = new TicTacToeAsyncTask();
-				taskRegister.execute("REGISTER " + idString);
-//				TicTacToeAsyncTask taskJoin = new TicTacToeAsyncTask();
-//				taskJoin.execute("JOIN " + idString + " " + groupNameString + " " + letterString);
+				taskRegister.execute("REGISTER," + idString);
+				TicTacToeAsyncTask taskJoin = new TicTacToeAsyncTask();
+				taskJoin.execute("JOIN," + idString + "," + groupNameString + "," + letterString);
 			}
 		}
 	}
 	
-	private void startTicTacToeAsyncTask(String string) {
-		String idString = idEditText.getText().toString();
-		String groupNameString = groupNameEditText.getText().toString();
-		String letterString = letterEditText.getText().toString();
-		if(idString.equals("") || groupNameString.equals("") || letterString.equals("")) {
-			Toast.makeText(getApplicationContext(), "Need Id, Group Name, and Letter!", Toast.LENGTH_SHORT).show();
-		} else {
-			TicTacToeAsyncTask task = new TicTacToeAsyncTask();
-			task.execute("SEND " + idEditText.getText().toString() + " " + groupNameEditText.getText().toString() + " " + letterEditText.getText().toString() + string);
+	public void pollButton1OnClick(View v) {
+		pollButton1.setEnabled(false);
+		TicTacToeAsyncTask taskRegister = new TicTacToeAsyncTask();
+		taskRegister.execute("POLL," + idEditText.getText().toString() + "," + groupNameEditText.getText().toString() + "," + letterEditText.getText().toString());
+	}
+	
+	private void startTicTacToeAsyncTask(String dash, String string) {
+		if(dash.equals("-")) {
+			Toast.makeText(getApplicationContext(), "Already Taken!", Toast.LENGTH_SHORT).show();
 		}
+			enableAllButtons(false);
+			pollButton1.setEnabled(true);
+			changeButtonTexts(letterEditText.getText().toString(), Integer.parseInt(string));
+			String idString = idEditText.getText().toString();
+			String groupNameString = groupNameEditText.getText().toString();
+			String letterString = letterEditText.getText().toString();
+			if(idString.equals("") || groupNameString.equals("") || letterString.equals("")) {
+				Toast.makeText(getApplicationContext(), "Need Id, Group Name, and Letter!", Toast.LENGTH_SHORT).show();
+			} else {
+				TicTacToeAsyncTask task = new TicTacToeAsyncTask();
+				task.execute("SEND," + idEditText.getText().toString() + "," + groupNameEditText.getText().toString() + "," + letterEditText.getText().toString() + string);
+			}
 	}
 	
 	public void button11OnClick(View v) {
-		startTicTacToeAsyncTask("11");
+		String letter11 = button11.getText().toString();
+		startTicTacToeAsyncTask(letter11, "11");
 	}
 	
 	public void button12OnClick(View v) {
-		startTicTacToeAsyncTask("12");
+		String letter12 = button12.getText().toString();
+		startTicTacToeAsyncTask(letter12, "12");
 	}
 	
 	public void button13OnClick(View v) {
-		startTicTacToeAsyncTask("13");
+		String letter13 = button13.getText().toString();
+		startTicTacToeAsyncTask(letter13, "13");
 	}
 	
 	public void button21OnClick(View v) {
-		startTicTacToeAsyncTask("21");
+		String letter21 = button23.getText().toString();
+		startTicTacToeAsyncTask(letter21, "21");
 	}
 	
 	public void button22OnClick(View v) {
-		startTicTacToeAsyncTask("22");
+		String letter22 = button22.getText().toString();
+		startTicTacToeAsyncTask(letter22, "22");
 	}
 	
 	public void button23OnClick(View v) {
-		startTicTacToeAsyncTask("23");
+		String letter23 = button23.getText().toString();
+		startTicTacToeAsyncTask(letter23, "23");
 	}
 	
 	public void button31OnClick(View v) {
-		startTicTacToeAsyncTask("31");
+		String letter31 = button31.getText().toString();
+		startTicTacToeAsyncTask(letter31, "31");
 	}
 	
 	public void button32OnClick(View v) {
-		startTicTacToeAsyncTask("32");
+		String letter32 = button11.getText().toString();
+		startTicTacToeAsyncTask(letter32, "32");
 	}
 	
 	public void button33OnClick(View v) {
-		startTicTacToeAsyncTask("33");
+		String letter33 = button33.getText().toString();
+		startTicTacToeAsyncTask(letter33, "33");
 	}
 	
 	private class TicTacToeAsyncTask extends AsyncTask<String, Void, String> {
@@ -233,11 +256,16 @@ public class MainActivity extends Activity {
 				// call receive (this will populate the packet with the received
 				// data, and the other endpoint's info)
 				System.out.println("about to receive");
-				socket.receive(rxPacket);
-				// print the payload
-				payload = new String(rxPacket.getData(), 0,
-						rxPacket.getLength());
-				System.out.println(payload);
+				if(params[0].startsWith("ACK")) {
+					String nullString = null;
+					return nullString;
+				} else {
+					socket.receive(rxPacket);
+					// print the payload
+					payload = new String(rxPacket.getData(), 0,
+							rxPacket.getLength());
+					System.out.println(payload);
+				}
 													
 			} catch (IOException e) {
 				System.out.println("blah3");
@@ -259,35 +287,54 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			if(result==null) {
-				Toast.makeText(getApplicationContext(), "No result received", Toast.LENGTH_SHORT).show();						
+				Toast.makeText(getApplicationContext(), "ACK", Toast.LENGTH_SHORT).show();						
 			}
-			else if(result.startsWith("ERROR")) {
-				Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+			else if(result.startsWith("ERROR") || result.startsWith("RROR")) {
+				//Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+				System.out.println("bad");
 			} 
 			else if(result.startsWith("REGISTERED")){
 				Toast.makeText(getApplicationContext(), "Registered!", Toast.LENGTH_SHORT).show();
-				sendButton.setEnabled(true);
+				//sendButton.setEnabled(true);
 			} 
 			else if(result.startsWith("JOINED1")) { //joined first 
+				firstPull = true;
+				Toast.makeText(getApplicationContext(), "Joined First!", Toast.LENGTH_SHORT).show();
 				enableAllButtons(true);
-				pollButton.setEnabled(false);
+				sendButton.setEnabled(false);
+				pollButton1.setEnabled(false);
 			}
 			else if(result.startsWith("JOINED2")) { //joined second
+				Toast.makeText(getApplicationContext(), "Joined Second!", Toast.LENGTH_SHORT).show();
 				enableAllButtons(false);
-				pollButton.setEnabled(true);
+				pollButton1.setEnabled(true);
+			} else if(result.startsWith("Sent")) {
+				Toast.makeText(getApplicationContext(), "Sent!", Toast.LENGTH_SHORT).show();
+				pollButton1.setEnabled(true);
 			} else { //POLL
 				System.out.println("WRONG");
 				if(result.equals("")) {
 					Toast.makeText(getApplicationContext(), "Waiting on other player... Try again later", Toast.LENGTH_SHORT).show();
 				} else { //must ack back
 					//make new asynctask("ACK id");
-					TicTacToeAsyncTask task = new TicTacToeAsyncTask();
-					task.execute("ACK " + idEditText.getText().toString());
-					String letter = result.substring(0, 1);
-					int rowCol = Integer.parseInt(result.substring(1));
-					changeButtonTexts(letter, rowCol);
-					checkForEndGame();
-					//do necessary edits to text of button and disable. then enable poll
+					if(firstPull) {
+						firstPull = false;
+						TicTacToeAsyncTask task = new TicTacToeAsyncTask();
+						task.execute("ACK," + idEditText.getText().toString());
+						TicTacToeAsyncTask taskRegister = new TicTacToeAsyncTask();
+						taskRegister.execute("POLL," + idEditText.getText().toString() + "," + groupNameEditText.getText().toString() + "," + letterEditText.getText().toString());
+					} else {
+						firstPull = true;
+						enableAllButtons(true);
+						pollButton1.setEnabled(false);
+						TicTacToeAsyncTask task = new TicTacToeAsyncTask();
+						task.execute("ACK," + idEditText.getText().toString());
+						String letter = result.substring(0, 1);
+						int rowCol = Integer.parseInt(result.substring(1,3));
+						changeButtonTexts(letter, rowCol);
+						checkForEndGame();
+						//do necessary edits to text of button and disable. then enable poll
+					}
 				}
 			}
 		}
@@ -352,19 +399,19 @@ public class MainActivity extends Activity {
 			button11.setText(letter);
 		} else if (rowCol == 12) {
 			button12.setText(letter);
-		} else if (rowCol == 12) {
+		} else if (rowCol == 13) {
 			button13.setText(letter);
-		} else if (rowCol == 12) {
+		} else if (rowCol == 21) {
 			button21.setText(letter);
-		} else if (rowCol == 12) {
+		} else if (rowCol == 22) {
 			button22.setText(letter);
-		} else if (rowCol == 12) {
+		} else if (rowCol == 23) {
 			button23.setText(letter);
-		} else if (rowCol == 12) {
+		} else if (rowCol == 31) {
 			button31.setText(letter);
-		} else if (rowCol == 12) {
+		} else if (rowCol == 32) {
 			button32.setText(letter);
-		} else if (rowCol == 12) {
+		} else if (rowCol == 33) {
 			button33.setText(letter);
 		} else {
 			Toast.makeText(getApplicationContext(), "Error in rowCol", Toast.LENGTH_SHORT).show();
