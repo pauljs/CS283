@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
 	private void startTicTacToeAsyncTask(String dash, String string) {
 		if(dash.equals("-")) {
 			Toast.makeText(getApplicationContext(), "Already Taken!", Toast.LENGTH_SHORT).show();
-		}
+		} else {
 			enableAllButtons(false);
 			pollButton1.setEnabled(true);
 			changeButtonTexts(letterEditText.getText().toString(), Integer.parseInt(string));
@@ -160,6 +160,7 @@ public class MainActivity extends Activity {
 				TicTacToeAsyncTask task = new TicTacToeAsyncTask();
 				task.execute("SEND," + idEditText.getText().toString() + "," + groupNameEditText.getText().toString() + "," + letterEditText.getText().toString() + string);
 			}
+		}
 	}
 	
 	public void button11OnClick(View v) {
