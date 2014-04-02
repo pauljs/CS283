@@ -309,6 +309,9 @@ public class MainActivity extends Activity {
 				Toast.makeText(getApplicationContext(), "Joined Second!", Toast.LENGTH_SHORT).show();
 				enableAllButtons(false);
 				pollButton1.setEnabled(true);
+			} else if(result.startsWith("SENT:")) {
+				Toast.makeText(getApplicationContext(), "Cant join!", Toast.LENGTH_SHORT).show();
+
 			} else if(result.startsWith("Sent")) {
 				Toast.makeText(getApplicationContext(), "Sent!", Toast.LENGTH_SHORT).show();
 				pollButton1.setEnabled(true);
