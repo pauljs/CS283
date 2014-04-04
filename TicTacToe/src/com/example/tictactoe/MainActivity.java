@@ -26,7 +26,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	protected static final int TICTACTOE_PORT = 20000;
-	protected static final String SERVER_ADDRESS = "10.67.11.253";//54.186.162.168//ec2-54-186-162-168.uswest-2.compute-amazonaws.com
+	protected static final String SERVER_ADDRESS = "54.186.162.168";//10.67.11.253//ec2-54-186-162-168.uswest-2.compute-amazonaws.com
 	public static final int MAX_PACKET_SIZE = 512;
 	public DatagramSocket socket;
 	
